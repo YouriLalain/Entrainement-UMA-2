@@ -1,0 +1,41 @@
+# Configuration pour l'entraînement OVIS Detection
+
+# Modèle
+model_name: "OpenGVLab/InternVL2-2B"  # Modèle VLM InternVL2-2B
+num_classes: 12
+detection_hidden_dim: 256
+roi_size: 7
+
+# Dataset
+train_json: "dataset/processed/train.json"
+val_json: "dataset/processed/val.json"
+images_dir: "dataset/images"
+
+# Device (Mac Apple Silicon)
+device: "cpu"  # AWQ ne supporte pas MPS, on utilise CPU
+
+# Entraînement
+epochs: 10
+batch_size: 4  # Optimisé pour GPU, ajuste selon la RAM GPU
+learning_rate: 1.0e-4
+weight_decay: 0.01
+num_workers: 4  # Optimisé pour Linux/GPU, ajuste selon le nombre de CPU
+
+# Sauvegarde
+experiments_dir: "experiments"
+save_every: 2  # Sauvegarde tous les N epochs
+
+# Classes
+classes:
+  - fuselage
+  - cockpit
+  - derive
+  - empennage
+  - aile
+  - aileron
+  - volet
+  - reacteur
+  - nacelle_moteur
+  - tuyere
+  - train_atterrissage
+  - porte
