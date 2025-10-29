@@ -179,7 +179,7 @@ def save_checkpoint(model, optimizer, epoch, loss, run_dir, is_best=False):
         'loss': loss
     }
     
-    # Sauvegarde le checkpoint
+    # Sauvegarde le checkpoint (lightweight - seulement la tête)
     checkpoint_path = run_dir / "checkpoints" / f"checkpoint_epoch_{epoch}.pt"
     torch.save(checkpoint, checkpoint_path)
     
@@ -192,6 +192,16 @@ def save_checkpoint(model, optimizer, epoch, loss, run_dir, is_best=False):
         best_path = run_dir / "checkpoints" / "checkpoint_best.pt"
         torch.save(checkpoint, best_path)
         print(f"🌟 Meilleur checkpoint sauvegardé (loss: {loss:.4f})")
+        
+        # Sauvegarde aussi le modèle COMPLET (pour push HF)
+        print("💾 Sauvegarde du modèle complet...")
+        full_model_path = run_dir / "checkpoints" / "full_model_best"
+        model.internvl_model.save_pretrained(full_model_path / "internvl2")
+        model.tokenizer.save_pretrained(full_model_path / "internvl2")
+        
+        # Sauvegarde la tête aussi dans le même dossier
+        torch.save(checkpoint, full_model_path / "detection_weights.pt")
+        print(f"✅ Modèle complet sauvegardé dans {full_model_path}")
 
 
 def train_epoch(model, dataloader, criterion, optimizer, device, epoch):

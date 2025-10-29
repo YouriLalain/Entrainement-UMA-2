@@ -1,16 +1,93 @@
 # 📦 Guide d'Export du Modèle
 
-## 🎯 Deux méthodes d'export
+## 🎯 Deux options d'export
 
-### 1️⃣ **Push sur Hugging Face Hub** (Recommandé)
-Permet de partager et télécharger facilement le modèle.
+### 1️⃣ **Modèle COMPLET** (InternVL2-2B + tête) - 4.4GB
+✅ Utilisable directement sans téléchargement supplémentaire  
+✅ Modèle "clé en main"  
+❌ Upload/download plus long (~4.4GB)
 
-### 2️⃣ **Export en ZIP/TAR.GZ**
-Pour télécharger directement depuis RunPod.
+### 2️⃣ **Tête uniquement** - 10MB
+✅ Upload/download ultra-rapide  
+❌ Nécessite de télécharger InternVL2-2B séparément  
 
 ---
 
-## 🔐 Préparation (une seule fois)
+## 🚀 Option 1 : Push du MODÈLE COMPLET (Recommandé pour vous)
+
+### Étape 1 : L'entraînement sauvegarde automatiquement
+
+Quand le meilleur modèle est sauvegardé, le système crée automatiquement :
+
+```
+experiments/run_XXX/checkpoints/
+├── checkpoint_best.pt          # Tête uniquement (10MB)
+└── full_model_best/            # MODÈLE COMPLET (4.4GB) ✨
+    ├── internvl2/              # InternVL2-2B complet
+    │   ├── config.json
+    │   ├── model.safetensors
+    │   └── ...
+    └── detection_weights.pt    # Votre tête de détection
+```
+
+### Étape 2 : Push sur Hugging Face
+
+```bash
+# Sur RunPod, après l'entraînement
+export HF_TOKEN="hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+python push_full_model_to_hf.py \
+    --model-dir experiments/run_003_2025-10-29_07-57/checkpoints/full_model_best \
+    --repo "VotreUsername/internvl2-aircraft-detection"
+
+# Pour un repo public
+python push_full_model_to_hf.py \
+    --model-dir experiments/run_003_2025-10-29_07-57/checkpoints/full_model_best \
+    --repo "VotreUsername/internvl2-aircraft-detection" \
+    --public
+```
+
+⏱️ **Temps estimé** : 5-10 minutes pour upload 4.4GB (avec bonne connexion)
+
+### Étape 3 : Utilisation (sur votre Mac)
+
+```bash
+# Installation
+pip install torch transformers huggingface_hub pillow pyyaml
+
+# Téléchargement
+huggingface-cli download VotreUsername/internvl2-aircraft-detection --local-dir ./my_model
+```
+
+```python
+# Utilisation
+from huggingface_hub import snapshot_download
+import torch
+from model import load_model
+import yaml
+
+# Télécharge le modèle complet
+model_path = snapshot_download(
+    repo_id="VotreUsername/internvl2-aircraft-detection",
+    local_dir="./my_model"
+)
+
+# Charge la config
+with open("my_model/config.yaml", 'r') as f:
+    config = yaml.safe_load(f)
+
+# Charge le modèle (tout est déjà là !)
+model = load_model(config)
+checkpoint = torch.load("my_model/detection_weights.pt")
+model.detection_head.load_state_dict(checkpoint['detection_head'])
+model.roi_projector.load_state_dict(checkpoint['roi_projector'])
+
+# Prêt à l'emploi ! 🚀
+```
+
+---
+
+## � Option 2 : Tête uniquement (Alternative légère)
 
 ### Obtenir votre token Hugging Face
 
