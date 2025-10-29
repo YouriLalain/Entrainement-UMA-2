@@ -35,6 +35,9 @@ matplotlib>=3.7.0
 # Pour accélérer les downloads HuggingFace
 hf_transfer>=0.1.4
 
+# Pour upload sur Hugging Face Hub
+huggingface_hub>=0.19.0
+
 # Pour Runpod GPU (CUDA 11.8)
 # Installe torch, torchvision, torchaudio optimisés GPU avec :
 # pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
