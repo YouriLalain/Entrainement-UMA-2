@@ -119,7 +119,10 @@ class Qwen25VLDetectionModel(nn.Module):
         
         # Détection dynamique de la dimension du vision encoder
         print("📐 Détection dynamique de la dimension du vision encoder...")
-        dummy_img = torch.zeros(1, 3, 448, 448)
+        # Crée dummy image avec le bon dtype et device
+        dummy_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+        dummy_device = "cuda" if torch.cuda.is_available() else "cpu"
+        dummy_img = torch.zeros(1, 3, 448, 448, dtype=dummy_dtype, device=dummy_device)
         with torch.no_grad():
                 # InternVL2-2B attend [B, 3, 448, 448]
                 vision_output = self.internvl_model.vision_model(dummy_img)
@@ -185,6 +188,9 @@ class Qwen25VLDetectionModel(nn.Module):
         with torch.no_grad():
             try:
                 # images: [B, 3, 448, 448]
+                # Convertir au bon dtype si nécessaire (float16 sur CUDA)
+                if torch.cuda.is_available() and images.dtype != torch.float16:
+                    images = images.half()
                 vision_output = self.internvl_model.vision_model(images)
                 features = vision_output.last_hidden_state if hasattr(vision_output, "last_hidden_state") else vision_output
             except Exception as e:
