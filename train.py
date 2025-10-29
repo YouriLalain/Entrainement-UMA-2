@@ -295,6 +295,8 @@ def train(config):
     # Charge le modèle
     print("\n" + "="*70)
     model = load_model(config)
+    model = model.to(device)  # Déplace explicitement le modèle sur le device
+    print(f"✅ Modèle déplacé vers {device}")
     
     # Dataset
     print("\n" + "="*70)

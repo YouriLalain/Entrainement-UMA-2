@@ -11,8 +11,8 @@ train_json: "dataset/processed/train.json"
 val_json: "dataset/processed/val.json"
 images_dir: "dataset/images"
 
-# Device (Mac Apple Silicon)
-device: "cpu"  # AWQ ne supporte pas MPS, on utilise CPU
+# Device (RunPod GPU)
+device: "cuda"  # Utilise le GPU CUDA sur RunPod
 
 # Entraînement
 epochs: 10

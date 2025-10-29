@@ -3,6 +3,7 @@
 # PyTorch pour Mac (Apple Silicon)
 torch>=2.0.0
 torchvision>=0.15.0
+torchaudio>=2.0.0
 
 # Transformers et Hugging Face
 transformers>=4.30.0
@@ -30,3 +31,13 @@ tqdm>=4.65.0
 
 # Pour l'inférence
 matplotlib>=3.7.0
+
+# Pour accélérer les downloads HuggingFace
+hf_transfer>=0.1.4
+
+# Pour Runpod GPU (CUDA 11.8)
+# Installe torch, torchvision, torchaudio optimisés GPU avec :
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+
+

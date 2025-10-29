@@ -107,9 +107,10 @@ class Qwen25VLDetectionModel(nn.Module):
         print("🔄 Chargement du modèle...")
         self.internvl_model = AutoModel.from_pretrained(
             config['model_name'],
-            torch_dtype=torch.float32,
+            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
             low_cpu_mem_usage=True,
-            trust_remote_code=True
+            trust_remote_code=True,
+            device_map="cuda" if torch.cuda.is_available() else "cpu"
         ).eval()
         # FREEZE tout le modèle InternVL2-2B
         print("❄️  Freeze du modèle InternVL2-2B...")
@@ -161,6 +162,12 @@ class Qwen25VLDetectionModel(nn.Module):
             device = "cpu"
         self.device = torch.device(device)
         print(f"✅ Device sélectionné automatiquement : {self.device}")
+        
+        # Déplace les modules trainables sur le device
+        print(f"🔄 Déplacement des modules trainables vers {self.device}...")
+        self.detection_head = self.detection_head.to(self.device)
+        self.roi_projector = self.roi_projector.to(self.device)
+        
         self._print_trainable_params()
     
     def _print_trainable_params(self):
